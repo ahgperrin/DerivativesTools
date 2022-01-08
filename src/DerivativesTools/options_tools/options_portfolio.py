@@ -1,0 +1,139 @@
+from src.DerivativesTools.options_tools.options import Options
+from datetime import datetime
+from src.DerivativesTools.bs_pricer.greeks import *
+from src.DerivativesTools.futures_tools.futures import Futures, Spot
+import numpy as np
+import matplotlib.pyplot as plt
+
+plt.style.use("seaborn")
+
+
+class OptionPortfolio:
+    def __init__(self, spot: float, strategy_name: str = "") -> None:
+        self.spot = spot
+        self.name = strategy_name
+        self.instrument: [Options, Futures, Spot] = []
+        self.maturity_spots = np.arange(0, spot * 2, spot / 1000)
+        self.payoffs = np.zeros_like(self.maturity_spots)
+        self.premiums = 0
+        self.delta = 0
+        self.gamma = 0
+        self.vega = 0
+        self.theta = 0
+        self.rho = 0
+
+    def destroy(self):
+        self.delta = 0
+        self.gamma = 0
+        self.vega = 0
+        self.theta = 0
+        self.rho = 0
+
+    def update_greeks(self, spot: float, computation_date: datetime, base: int):
+        self.spot = spot
+        self.destroy()
+        for ins in self.instrument:
+            if isinstance(ins, Options):
+                tt_maturity = (ins.maturity_datetime - computation_date).total_seconds() / (base * 86400)
+                params = BsParams(ins.opt_type, ins.implied_vol, tt_maturity, ins.risk_free_rate,
+                                  ins.dividend, spot, ins.strike)
+                carac = option_carac(params, ins.side)
+                self.delta += (carac.get("Delta") * ins.qty)
+                self.gamma += (carac.get("Gamma") * ins.qty)
+                self.theta += (carac.get("Theta") * ins.qty)
+                self.vega += (carac.get("Vega") * ins.qty)
+                self.rho += (carac.get("Rho") * ins.qty)
+            if isinstance(ins, Futures):
+                self.delta += (ins.qty * 1)
+            if isinstance(ins, Spot):
+                self.delta += (ins.qty * 1)
+        self.portfolio_sensibilities()
+
+    def long_call(self, price: float, strike: float, maturity_datetime: datetime,
+                  implied_vol: float, risk_free_rate: float, dividend: float, qty: float):
+        self.instrument.append(
+            Options("c", price, strike, 1, maturity_datetime, implied_vol, risk_free_rate, dividend, qty))
+        payoff = np.array([max(s - strike, 0) - price for s in self.maturity_spots]) * qty
+        self.payoffs = self.payoffs + payoff
+        self.premiums = self.premiums - (price * qty)
+
+    def short_call(self, price: float, strike: float, maturity_datetime: datetime,
+                   implied_vol: float, risk_free_rate: float, dividend: float, qty: float):
+        self.instrument.append(
+            Options("c", price, strike, -1, maturity_datetime, implied_vol, risk_free_rate, dividend, qty))
+        payoff = np.array([max(s - strike, 0) * -1 + price for s in self.maturity_spots]) * qty
+        self.payoffs = self.payoffs + payoff
+        self.premiums = self.premiums + (price * qty)
+
+    def long_put(self, price: float, strike: float, maturity_datetime: datetime,
+                 implied_vol: float, risk_free_rate: float, dividend: float, qty: float):
+        self.instrument.append(
+            Options("p", price, strike, -1, maturity_datetime, implied_vol, risk_free_rate, dividend, qty))
+        payoff = np.array([max(strike - s, 0) - price for s in self.maturity_spots]) * qty
+        self.payoffs = self.payoffs + payoff
+        self.premiums = self.premiums - (price * qty)
+
+    def short_put(self, price: float, strike: float, maturity_datetime: datetime,
+                  implied_vol: float, risk_free_rate: float, dividend: float, qty: float):
+        self.instrument.append(
+            Options("p", price, strike, -1, maturity_datetime, implied_vol, risk_free_rate, dividend, qty))
+        payoff = np.array([max(strike - s, 0) * -1 + price for s in self.maturity_spots]) * qty
+        self.payoffs = self.payoffs + payoff
+        self.premiums = self.premiums + (price * qty)
+
+    def long_future(self, name: str, maturity: datetime, price: float, qty: float, contract_size: float) -> None:
+        self.instrument.append(Futures(name, maturity, price, qty, contract_size))
+        payoff = (self.maturity_spots - price) * qty
+        self.payoffs += payoff
+        self.delta += qty * 1.0
+
+    def short_future(self, name: str, maturity: datetime, price: float, qty: float, contract_size: float) -> None:
+        self.instrument.append(Futures(name, maturity, price, -qty, contract_size))
+        payoff = (price - self.maturity_spots) * qty
+        self.payoffs += payoff
+        self.delta += -qty * 1.0
+
+    def long_spot(self, name: str, qty: float, price: float) -> None:
+        self.instrument.append(Spot(name, price, qty))
+        payoff = (self.maturity_spots - price) * qty
+        self.payoffs += payoff
+        self.delta += qty * 1.0
+        self.premiums -= qty * price
+
+    def short_spot(self, name: str, qty: float, price: float) -> None:
+        self.instrument.append(Spot(name, price, -qty))
+        payoff = (price - self.maturity_spots) * qty
+        self.payoffs += payoff
+        self.delta += -qty * 1.0
+        self.premiums += qty * price
+
+    def portfolio_sensibilities(self) -> None:
+        print('====== PORTFOLIO DESCRIPTION ======\n'
+              'Delta: ', self.delta, '\n',
+              'Gamma: ', self.gamma, '\n',
+              'Vega: ', self.vega, '\n',
+              'Theta: ', self.theta, '\n',
+              'Rho: ', self.rho, '\n',
+              )
+
+    def plot_strategy(self, var_breakeven: tuple = None):
+        fig = plt.figure(figsize=(12.5, 8))
+        fig.suptitle(self.name)
+        fig.canvas.set_window_title(self.name)
+        ax1 = fig.add_subplot(111)
+        ax1.set_xlabel("Asset Price Maturity")
+        ax1.set_ylabel('Profit in $')
+        ax1.plot(self.maturity_spots, self.payoffs, label="PnL Structure")
+        ax1.fill_between(self.maturity_spots, self.payoffs,
+                         where=(self.payoffs > 0), facecolor='g', alpha=0.4, label="Positive Pnl")
+        ax1.fill_between(self.maturity_spots, self.payoffs,
+                         where=(self.payoffs < 0), facecolor='r', alpha=0.4, label="Negative Pnl")
+        ax1.axvline(self.spot, c='green', label="Spot: " + str(self.spot))
+        if var_breakeven is None:
+            pass
+        else:
+            ax1.axvline(var_breakeven[0], c="r", label="Var Down: " + str(var_breakeven[0]))
+            ax1.axvline(var_breakeven[1], c="r", label="Var Up: " + str(var_breakeven[1]))
+        plt.legend()
+        plt.show()
+        return fig
