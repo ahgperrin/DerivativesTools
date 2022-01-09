@@ -47,12 +47,12 @@ def merton_jump_put(mjd_params: JumpDiffusionParams, strike: float):
 
 
 def merton_jump_histo_calibration(mjd_params: JumpDiffusionParams, returns: pd.Series, base,
-                                  jumps: float) -> JumpDiffusionParams:
+                                  jumps: float,nb_days:int) -> JumpDiffusionParams:
     jumps_values = returns[(returns >= jumps) | (returns <= -jumps)].dropna()
     mjd_params.j_lambda = len(jumps_values) / len(returns)
     mjd_params.j_sigma = float(jumps_values.std())
     mjd_params.j_mu = float(jumps_values.mean())
     returns = returns[~((returns >= jumps) | (returns <= -jumps))]
-    mjd_params.mu = float(returns.dropna().mean() * base)
-    mjd_params.sigma = float(returns.dropna().std() * np.sqrt(base))
+    mjd_params.mu = float(returns.tail(nb_days).dropna().mean() * base)
+    mjd_params.sigma = float(returns.tail(nb_days).dropna().std() * np.sqrt(base))
     return mjd_params

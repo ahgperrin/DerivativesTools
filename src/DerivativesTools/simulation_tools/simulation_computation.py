@@ -8,6 +8,7 @@ from scipy.stats import norm
 import scipy.stats as stats
 import statsmodels.api as sm
 import pylab as py
+
 plt.style.use("seaborn")
 
 
@@ -15,7 +16,6 @@ class Simulation:
 
     def __init__(self, paths: np.ndarray) -> None:
         self._paths = paths
-
 
     @property
     def paths(self) -> np.ndarray:
@@ -41,12 +41,40 @@ class Simulation:
     def european_put(self, strike: float, rf: float, tt_maturity: float) -> float:
         return np.mean(strike - np.maximum(self.paths[-1], 0)) * np.exp(-rf * tt_maturity)
 
-    def value_at_risk(self, alpha: float):
+    def value_at_risk(self, alpha: float, up: bool = True):
         nb_scenarios = math.ceil(alpha * len(self.paths[0]))
-        sorted_scenarios = np.sort(self.paths[-1])
-        var = sorted_scenarios[nb_scenarios] - self.paths[0, 0]
+        if up:
+            sorted_scenarios = np.sort(self.paths[-1])
+            var = sorted_scenarios[nb_scenarios] - self.paths[0, 0]
+        else:
+            sorted_scenarios = np.sort(self.paths[-1])[::-1]
+            var = self.paths[0, 0] - sorted_scenarios[nb_scenarios]
         conf_int = st.t.interval(1 - alpha, len(sorted_scenarios) - 1, loc=var, scale=st.sem(sorted_scenarios))
         return var, conf_int
+
+    def expected_shortfall(self, alpha: float, up: bool = True):
+        nb_scenarios = math.ceil(alpha * len(self.paths[0]))
+        if up:
+            sorted_scenarios = np.sort(self.paths[-1])
+            var = sorted_scenarios[:nb_scenarios] - self.paths[0, 0]
+        else:
+            sorted_scenarios = np.sort(self.paths[-1])[::-1]
+            var = self.paths[0, 0] - sorted_scenarios[:nb_scenarios]
+        return var.mean()
+
+    def min_max(self):
+        return self.paths[-1].min(), self.paths[-1].max()
+
+    def breakeven_probability(self, breakeven_value: float):
+        sorted_scenarios = np.sort(self.paths[-1])
+        filter_scenario = sorted_scenarios[sorted_scenarios > breakeven_value]
+        return len(filter_scenario) / len(sorted_scenarios)
+
+    def breakeven_monte_carlo(self, breakeven_vals: []):
+        probs = []
+        for born in breakeven_vals:
+            probs.append(self.breakeven_probability(born))
+        return probs
 
     def plot_distribution(self):
         df = pd.DataFrame(self.paths)
@@ -56,7 +84,7 @@ class Simulation:
         ax1 = plt.subplot2grid((2, 1), (0, 0), rowspan=1, colspan=1, fig=fig)
         sns.distplot(ret.dropna(), fit=norm, ax=ax1)
         ax2 = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1, fig=fig)
-        sm.qqplot(ret.dropna().values.flatten(), line='q',ax=ax2)
+        sm.qqplot(ret.dropna().values.flatten(), line='q', ax=ax2)
         py.show()
 
 
@@ -134,5 +162,5 @@ class SimulationProcVol:
         ax1 = plt.subplot2grid((2, 1), (0, 0), rowspan=1, colspan=1, fig=fig)
         sns.distplot(ret.dropna(), fit=norm, ax=ax1)
         ax2 = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1, fig=fig)
-        sm.qqplot(ret.dropna().values.flatten(), line='q',ax=ax2)
+        sm.qqplot(ret.dropna().values.flatten(), line='q', ax=ax2)
         py.show()

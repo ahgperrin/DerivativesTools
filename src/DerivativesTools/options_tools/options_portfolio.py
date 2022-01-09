@@ -16,6 +16,7 @@ class OptionPortfolio:
         self.maturity_spots = np.arange(0, spot * 2, spot / 1000)
         self.payoffs = np.zeros_like(self.maturity_spots)
         self.premiums = 0
+        self.mark_to_market = 0
         self.delta = 0
         self.gamma = 0
         self.vega = 0
@@ -23,6 +24,7 @@ class OptionPortfolio:
         self.rho = 0
 
     def destroy(self):
+        self.mark_to_market = 0
         self.delta = 0
         self.gamma = 0
         self.vega = 0
@@ -38,14 +40,17 @@ class OptionPortfolio:
                 params = BsParams(ins.opt_type, ins.implied_vol, tt_maturity, ins.risk_free_rate,
                                   ins.dividend, spot, ins.strike)
                 carac = option_carac(params, ins.side)
+                self.mark_to_market += (carac.get("Price") * ins.qty * ins.side)
                 self.delta += (carac.get("Delta") * ins.qty)
                 self.gamma += (carac.get("Gamma") * ins.qty)
                 self.theta += (carac.get("Theta") * ins.qty)
                 self.vega += (carac.get("Vega") * ins.qty)
                 self.rho += (carac.get("Rho") * ins.qty)
             if isinstance(ins, Futures):
+                self.mark_to_market += (ins.price - spot) * ins.qty
                 self.delta += (ins.qty * 1)
             if isinstance(ins, Spot):
+                self.mark_to_market += spot * ins.qty
                 self.delta += (ins.qty * 1)
         self.portfolio_sensibilities()
 
@@ -68,7 +73,7 @@ class OptionPortfolio:
     def long_put(self, price: float, strike: float, maturity_datetime: datetime,
                  implied_vol: float, risk_free_rate: float, dividend: float, qty: float):
         self.instrument.append(
-            Options("p", price, strike, -1, maturity_datetime, implied_vol, risk_free_rate, dividend, qty))
+            Options("p", price, strike, 1, maturity_datetime, implied_vol, risk_free_rate, dividend, qty))
         payoff = np.array([max(strike - s, 0) - price for s in self.maturity_spots]) * qty
         self.payoffs = self.payoffs + payoff
         self.premiums = self.premiums - (price * qty)
@@ -114,9 +119,25 @@ class OptionPortfolio:
               'Vega: ', self.vega, '\n',
               'Theta: ', self.theta, '\n',
               'Rho: ', self.rho, '\n',
+              'Mark To market', self.mark_to_market, '\n',
               )
 
-    def plot_strategy(self, var_breakeven: tuple = None):
+    def breakeven(self):
+        interval = (self.maturity_spots[1] - self.maturity_spots[0]) * 2
+        breakeven = []
+        results = []
+        for i in range(len(self.payoffs)):
+            if self.payoffs[i] >= 0:
+                results.append(self.maturity_spots[i])
+        breakeven.append(results[0])
+        for i in range(1, len(results), 1):
+            if results[i] - results[i - 1] > interval:
+                breakeven.append(results[i - 1])
+                breakeven.append(results[i])
+        breakeven.append(results[len(results) - 1])
+        return breakeven
+
+    def plot_strategy(self, var_breakeven: tuple = None, es_breakeven: tuple = None,min_max: tuple = None):
         fig = plt.figure(figsize=(12.5, 8))
         fig.suptitle(self.name)
         fig.canvas.set_window_title(self.name)
@@ -132,8 +153,19 @@ class OptionPortfolio:
         if var_breakeven is None:
             pass
         else:
-            ax1.axvline(var_breakeven[0], c="r", label="Var Down: " + str(var_breakeven[0]))
-            ax1.axvline(var_breakeven[1], c="r", label="Var Up: " + str(var_breakeven[1]))
+            ax1.axvline(var_breakeven[0], c="y", label="Var Down: " + str(var_breakeven[0]))
+            ax1.axvline(var_breakeven[1], c="y", label="Var Up: " + str(var_breakeven[1]))
+        if es_breakeven is None:
+            pass
+        else:
+            ax1.axvline(es_breakeven[0], c="orange", label="ES Down: " + str(es_breakeven[0]))
+            ax1.axvline(es_breakeven[1], c="orange", label="ES Up: " + str(es_breakeven[1]))
+        if min_max is None:
+            pass
+        else:
+            ax1.axvline(min_max[0], c="r", label="Minimum: " + str(min_max[0]))
+            ax1.axvline(min_max[1], c="r", label="Maximum: " + str(min_max[1]))
+
         plt.legend()
         plt.show()
         return fig

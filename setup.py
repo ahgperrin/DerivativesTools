@@ -25,7 +25,8 @@ setup(
                 "merton_jump_diffusion",
                 "model_params",
                 "ornstein_uhlenbeck",
-                "simulation_computation"],
+                "simulation_computation",
+                "tools"],
     package_dir={'': 'src'},
     packages=setuptools.find_packages(where="src"),
     classifiers=[
