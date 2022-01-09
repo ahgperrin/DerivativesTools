@@ -88,3 +88,4 @@ class SurfaceView(Surface):
         ax.set_xlabel('times')
         ax.set_ylabel('strikes')
         ax.set_zlabel('IV (%)')
+        plt.show()

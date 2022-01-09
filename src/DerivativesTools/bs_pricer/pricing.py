@@ -1,4 +1,4 @@
-from src.DerivativesTools.bs_pricer.bs_params import BsParams
+from DerivativesTools.bs_pricer.bs_params import BsParams
 from scipy.stats import norm
 import numpy as np
 

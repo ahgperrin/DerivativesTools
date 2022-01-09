@@ -1,9 +1,9 @@
-from src.DerivativesTools.simulation_tools.model_params import GeometricBrownianParams
+from DerivativesTools.simulation_tools.model_params import GeometricBrownianParams
 import numpy as np
 import pandas as pd
 from typing import Union
 
-from src.DerivativesTools.simulation_tools.simulation_computation import Simulation
+from DerivativesTools.simulation_tools.simulation_computation import Simulation
 
 
 def brownian_path(geo_params: GeometricBrownianParams, n_paths: int) -> Simulation:

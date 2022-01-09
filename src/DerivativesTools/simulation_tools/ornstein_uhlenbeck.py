@@ -1,7 +1,7 @@
-from src.DerivativesTools.simulation_tools.model_params import OrnsteinUhlenbeckParams
+from DerivativesTools.simulation_tools.model_params import OrnsteinUhlenbeckParams
 import numpy as np
 import pandas as pd
-from src.DerivativesTools.simulation_tools.simulation_computation import Simulation
+from DerivativesTools.simulation_tools.simulation_computation import Simulation
 from sklearn.linear_model import LinearRegression
 
 

@@ -1,4 +1,4 @@
-from src.DerivativesTools.bs_pricer.pricing import *
+from DerivativesTools.bs_pricer.pricing import *
 import numpy as np
 
 

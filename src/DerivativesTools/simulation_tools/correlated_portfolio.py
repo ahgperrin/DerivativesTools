@@ -1,8 +1,8 @@
 import numpy as np
 
-from src.DerivativesTools.simulation_tools.geometric_brownian import brownian_path_wiener
-from src.DerivativesTools.simulation_tools.model_params import GeometricBrownianParams
-from src.DerivativesTools.simulation_tools.simulation_computation import Simulation
+from DerivativesTools.simulation_tools.geometric_brownian import brownian_path_wiener
+from DerivativesTools.simulation_tools.model_params import GeometricBrownianParams
+from DerivativesTools.simulation_tools.simulation_computation import Simulation
 
 
 def create_matrix(returns_matrix: np.ndarray):

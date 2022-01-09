@@ -32,6 +32,7 @@ class Simulation:
         ax1.plot(self.paths[:, [i for i in range(nb_paths)]], lw=0.7)
         ax1.set_xlabel("Time,t")
         ax1.set_ylabel("Asset Price")
+        plt.show()
         return fig
 
     def european_call(self, strike: float, rf: float, tt_maturity: float) -> float:

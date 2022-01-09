@@ -1,7 +1,7 @@
-from src.DerivativesTools.options_tools.options import Options
+from DerivativesTools.options_tools.options import Options
 from datetime import datetime
-from src.DerivativesTools.bs_pricer.greeks import *
-from src.DerivativesTools.futures_tools.futures import Futures, Spot
+from DerivativesTools.bs_pricer.greeks import *
+from DerivativesTools.futures_tools.futures import Futures, Spot
 import numpy as np
 import matplotlib.pyplot as plt
 

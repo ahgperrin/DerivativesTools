@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 
-from src.DerivativesTools.simulation_tools.model_params import JumpDiffusionParams
-from src.DerivativesTools.simulation_tools.simulation_computation import Simulation
-from src.DerivativesTools.simulation_tools.tools import european_call, european_put
+from DerivativesTools.simulation_tools.model_params import JumpDiffusionParams
+from DerivativesTools.simulation_tools.simulation_computation import Simulation
+from DerivativesTools.simulation_tools.tools import european_call, european_put
 
 
 def merton_jump_path(mjd_params: JumpDiffusionParams, n_paths: int) -> Simulation:

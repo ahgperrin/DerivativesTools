@@ -1,9 +1,9 @@
 import arch
 import numpy as np
 import pandas as pd
-from src.DerivativesTools.simulation_tools.model_params import HestonParams, OrnsteinUhlenbeckParams
-from src.DerivativesTools.simulation_tools.ornstein_uhlenbeck import calibration_ornstein_uhlenbeck
-from src.DerivativesTools.simulation_tools.simulation_computation import Simulation, SimulationProcVol
+from DerivativesTools.simulation_tools.model_params import HestonParams, OrnsteinUhlenbeckParams
+from DerivativesTools.simulation_tools.ornstein_uhlenbeck import calibration_ornstein_uhlenbeck
+from DerivativesTools.simulation_tools.simulation_computation import Simulation, SimulationProcVol
 
 pd.options.mode.chained_assignment = None
 
