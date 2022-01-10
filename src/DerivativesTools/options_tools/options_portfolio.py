@@ -16,7 +16,6 @@ class OptionPortfolio:
         self.maturity_spots = np.arange(0, spot * 2, spot / 1000)
         self.payoffs = np.zeros_like(self.maturity_spots)
         self.premiums = 0
-        self.mark_to_market = 0
         self.delta = 0
         self.gamma = 0
         self.vega = 0
@@ -24,7 +23,6 @@ class OptionPortfolio:
         self.rho = 0
 
     def destroy(self):
-        self.mark_to_market = 0
         self.delta = 0
         self.gamma = 0
         self.vega = 0
@@ -40,17 +38,14 @@ class OptionPortfolio:
                 params = BsParams(ins.opt_type, ins.implied_vol, tt_maturity, ins.risk_free_rate,
                                   ins.dividend, spot, ins.strike)
                 carac = option_carac(params, ins.side)
-                self.mark_to_market += (carac.get("Price") * ins.qty * ins.side)
                 self.delta += (carac.get("Delta") * ins.qty)
                 self.gamma += (carac.get("Gamma") * ins.qty)
                 self.theta += (carac.get("Theta") * ins.qty)
                 self.vega += (carac.get("Vega") * ins.qty)
                 self.rho += (carac.get("Rho") * ins.qty)
             if isinstance(ins, Futures):
-                self.mark_to_market += (ins.price - spot) * ins.qty
                 self.delta += (ins.qty * 1)
             if isinstance(ins, Spot):
-                self.mark_to_market += spot * ins.qty
                 self.delta += (ins.qty * 1)
         self.portfolio_sensibilities()
 
@@ -119,7 +114,6 @@ class OptionPortfolio:
               'Vega: ', self.vega, '\n',
               'Theta: ', self.theta, '\n',
               'Rho: ', self.rho, '\n',
-              'Mark To market', self.mark_to_market, '\n',
               )
 
     def breakeven(self):
