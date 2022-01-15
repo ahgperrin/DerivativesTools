@@ -78,18 +78,12 @@ PACKAGE CONTENTS<br>
 
 ## Import Framework
 ```sh
-# Import a packages to use it as reference
-import DerivativesTools.bs_pricer as bs 
-import DerivativesTools.fx_pricer as fx 
-import DerivativesTools.futures_tools as ft 
-import DerivativesTools.options_tools as opt 
-import DerivativesTools.simulation_tools as sim 
-
-# Import directly all features of a defined package
-from DerivativesTools.bs_pricer import *
-
-# Import directly one function or class
-from DerivativesTools.bs_pricer import BsParams
+# Import a module to use it as reference
+import DerivativesTools.bs_pricer.pricing as p
+import DerivativesTools.fx_pricer.fx_pricer as fx
+import DerivativesTools.futures_tools.futures as f
+import DerivativesTools.options_tools.options_portfolio as port 
+import DerivativesTools.simulation_tools.merton_jump_diff as jump_diff 
 ```
 
 # Sub Packages
