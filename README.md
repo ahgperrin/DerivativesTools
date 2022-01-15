@@ -87,9 +87,10 @@ import DerivativesTools.simulation_tools.merton_jump_diff as jump_diff
 ```
 
 # Sub Packages
-##bs_pricer
-##futures_tools
-##fx_pricer
-##options_tools
-##simulation_tools
+## bs_pricer
+
+## futures_tools
+## fx_pricer
+## options_tools
+## simulation_tools
 # Future Release
