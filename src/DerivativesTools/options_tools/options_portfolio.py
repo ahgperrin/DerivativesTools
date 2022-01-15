@@ -98,14 +98,12 @@ class OptionPortfolio:
         payoff = (self.maturity_spots - price) * qty
         self.payoffs += payoff
         self.delta += qty * 1.0
-        self.premiums -= qty * price
 
     def short_spot(self, name: str, qty: float, price: float) -> None:
         self.instrument.append(Spot(name, price, -qty))
         payoff = (price - self.maturity_spots) * qty
         self.payoffs += payoff
         self.delta += -qty * 1.0
-        self.premiums += qty * price
 
     def portfolio_sensibilities(self) -> None:
         print('====== PORTFOLIO DESCRIPTION ======\n'
@@ -131,7 +129,7 @@ class OptionPortfolio:
         breakeven.append(results[len(results) - 1])
         return breakeven
 
-    def plot_strategy(self, var_breakeven: tuple = None, es_breakeven: tuple = None,min_max: tuple = None):
+    def plot_strategy(self, var_breakeven: tuple = None, es_breakeven: tuple = None, min_max: tuple = None):
         fig = plt.figure(figsize=(12.5, 8))
         fig.suptitle(self.name)
         fig.canvas.set_window_title(self.name)

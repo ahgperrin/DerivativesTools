@@ -9,7 +9,7 @@ plt.style.use('bmh')
 def fig_plot(price_list: list, delta_list: list, vega_list: list, gamma_list: list, theta_list: list, rho_list: list,
              exog: str,
              exog_list: np.ndarray):
-    fig = plt.figure(figsize=(7, 15), dpi=100)
+    fig = plt.figure(figsize=(10, 12), dpi=100)
     fig.suptitle("Evolution of Greeks for a variation of " + str(exog))
     ax1 = fig.add_subplot(611)
     ax1.plot(exog_list, delta_list, label='Delta')
@@ -30,6 +30,7 @@ def fig_plot(price_list: list, delta_list: list, vega_list: list, gamma_list: li
     ax5 = fig.add_subplot(615)
     ax5.plot(exog_list, vega_list, label='Vega')
     ax5.legend(loc=0)
+    ax5.get_xaxis().set_visible(False)
     ax6 = fig.add_subplot(616)
     ax6.plot(exog_list, price_list, label='Price')
     ax6.legend(loc=0)
@@ -67,7 +68,7 @@ def spot_sensi(portfolio: OptionPortfolio, spot, basis: int, computation_date: d
                 l_vega = l_vega + carac.get("Vega")
                 l_theta = l_theta + carac.get("Theta")
                 l_rho = l_rho + carac.get("Rho")
-                l_price + (carac.get("Price")*ins_copy.side)
+                l_price = l_price + (carac.get("Price") * ins_copy.side)
             if isinstance(ins, Futures):
                 l_delta = l_delta + (ins.qty * 1)
             if isinstance(ins, Spot):
@@ -113,7 +114,7 @@ def volatility_sensi(portfolio: OptionPortfolio, spot, basis: int, computation_d
                 l_vega = l_vega + carac.get("Vega")
                 l_theta = l_theta + carac.get("Theta")
                 l_rho = l_rho + carac.get("Rho")
-                l_price + (carac.get("Price")*ins_copy.side)
+                l_price = l_price + (carac.get("Price") * ins_copy.side)
             if isinstance(ins, Futures):
                 l_delta = l_delta + (ins.qty * 1)
             if isinstance(ins, Spot):
@@ -160,7 +161,7 @@ def rate_sensi(portfolio: OptionPortfolio, spot, basis: int, computation_date: d
                 l_vega = l_vega + carac.get("Vega")
                 l_theta = l_theta + carac.get("Theta")
                 l_rho = l_rho + carac.get("Rho")
-                l_price + (carac.get("Price")*ins_copy.side)
+                l_price = l_price + (carac.get("Price") * ins_copy.side)
             if isinstance(ins, Futures):
                 l_delta = l_delta + (ins.qty * 1)
             if isinstance(ins, Spot):
@@ -184,7 +185,10 @@ def time_sensi(portfolio: OptionPortfolio, spot, basis: int, graphs: bool = Fals
     theta_list = []
     rho_list = []
     price_list = []
-    lin_time = -np.sort(-np.arange(0, 20, 1))
+    i = 0
+    while not isinstance(portfolio.instrument[i], Options):
+        i += 1
+    lin_time = -np.sort(-np.arange(0, (portfolio.instrument[i].maturity_datetime-datetime.now()).days+1, 1))
 
     for times in lin_time:
         l_delta: float = 0
@@ -207,7 +211,7 @@ def time_sensi(portfolio: OptionPortfolio, spot, basis: int, graphs: bool = Fals
                 l_vega = l_vega + carac.get("Vega")
                 l_theta = l_theta + carac.get("Theta")
                 l_rho = l_rho + carac.get("Rho")
-                l_price = l_price + (carac.get("Price")*ins_copy.side)
+                l_price = l_price + (carac.get("Price") * ins_copy.side)
             if isinstance(ins, Futures):
                 l_delta = l_delta + (ins.qty * 1)
             if isinstance(ins, Spot):

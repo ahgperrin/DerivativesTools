@@ -38,5 +38,6 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=["matplotlib", "pandas", "numpy",
                       "scipy", "typing", "sklearn",
-                      "arch", "seaborn", "statsmodels"],
+                      "arch", "seaborn", "statsmodels",
+                      ],
 )
