@@ -1,6 +1,13 @@
 from DerivativesTools.bs_pricer.bs_params import BsParams
 from scipy.stats import norm
 import numpy as np
+from datetime import datetime
+
+
+def time_maturity(start: datetime, end: datetime, base: int) -> float:
+    delta_t = (end - start).total_seconds()
+    yearly = base * 24 * 60 * 60
+    return delta_t / yearly
 
 
 def moneyness(params: BsParams) -> float:
