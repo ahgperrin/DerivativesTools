@@ -179,5 +179,23 @@ Out[79]: 0.5299617374218752
 smile_spy_FEB22.plot_smile()
 ```
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/smile.png?raw=true)
+
+```pycon
+import DerivativesTools.options_tools.vol_structure as vol
+strikes = np.array([3500,3700,3900,4100,4300,4500,4700])
+times = np.array([delta_t,p.time_maturity(datetime.now(),datetime(2022,3,18,9),365),p.time_maturity(datetime.now(),datetime(2022,6,17,9),365)])
+vols = np.array([[0.45039449, 0.36510866, 0.32090798],
+        [0.39074959, 0.33293169, 0.2654696 ],
+        [0.33751239, 0.30039171, 0.27685892],
+        [0.29056983, 0.2676429 , 0.25393176],
+        [0.24691772, 0.2348904 , 0.22909017],
+        [0.20304341, 0.19822715, 0.20403733],
+        [0.15650284, 0.15987016, 0.17808935]])
+surface_spy = vol.SurfaceView(strikes,vols,times)
+surface_spy.get_volatility(0.4,3650)
+Out[91]: 0.2723802697287282
+surface_spy.plot_surface()
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/surface.png?raw=true)
 ## simulation_tools
 # Future Release
