@@ -1,4 +1,4 @@
-![](https://github.com/ahgperrin/DerivativesTools/blob/master/logo.png?raw=true)
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/logo.png?raw=true)
 -----------------
 # DerivativesTools - Python Powerful Derivatives Management
 
