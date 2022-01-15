@@ -166,6 +166,74 @@ array([[0.45039449, 0.36510866, 0.32090798],
 ## futures_tools
 ## fx_pricer
 ## options_tools
+### options_portfolio
+This module is useful in order to create derivatives strategies. With 
+this module you can create a portfolio and buy/sell :
+- Futures (No basis cash flows adding delta one)
+- Options (Adding an option with his greeks)
+- Spot (Basis cash flows adding delta one)
+Steps :
+- Create a portfolio
+```pycon
+import DerivativesTools.options_tools.options_portfolio as port 
+from datetime import datetime
+iron_condor_delta_zero = port.OptionPortfolio(spot=4668.13,strategy_name="Iron Condor Delta 0")
+```
+- Add instrument
+```pycon
+# Let's add the short side
+iron_condor_delta_zero.short_call(43.63,4750,datetime(2022,2,18),0.1375,0,0,1)
+iron_condor_delta_zero.short_put(55.34,4550,datetime(2022,2,18),0.187,0,0,1)
+# Let's add the long side
+iron_condor_delta_zero.long_call(13.61,4850,datetime(2022,2,18),0.1188,0,0,1)
+iron_condor_delta_zero.long_put(38.34,4450,datetime(2022,2,18),0.207,0,0,1)
+# Let's get the greeks to decide how much futures to buy/Sell for the delta 0
+iron_condor_delta_zero.update_greeks(spot=4668.13,computation_date=datetime.now(),base=365)
+====== PORTFOLIO DESCRIPTION ======
+Delta:  -0.09575683317454081 
+Gamma:  -0.0008727811287243131 
+Vega:  -2.590955912138729 
+Theta:  0.6238258209361129 
+Rho:  -0.454653006614935 
+
+# Let's buy 0.0957 Futures
+iron_condor_delta_zero.long_future("SPY FEB18 FUTURES",datetime(2022,2,18),4668.13,0.0957,1)
+
+```
+- Update portfolio
+```pycon
+# Let's update to see the results
+iron_condor_delta_zero.update_greeks(spot=4668.13,computation_date=datetime.now(),base=365)
+====== PORTFOLIO DESCRIPTION ======
+Delta:  -5.773462631776527e-05 
+Gamma:  -0.0008728648675007575 
+Vega:  -2.5910206405202407 
+Theta:  0.6238797382280059 
+Rho:  -0.4546265031895683
+```
+When the spot is moving our the computation date is needed to be change you have to update
+the greeks in order to be fine. You can also re-build the portfolio in order
+to update implied volatility of your options
+
+- Plotting and work 
+You can see the breakeven Positive Negative PnL of your strategy using
+```
+iron_condor_delta_zero.breakeven()
+Out[13]: [4518.7498399999995, 4808.1739, 5223.63747, 9336.26]
+```
+You need to read the result from left to right as : 
+Negative before 4518, at this value switch positive.
+Then switch negative at 4808 then switch positive 
+at 5223 till maximum.
+
+You can also plot the strategy with 
+```
+iron_condor_delta_zero.plot_strategy()
+# Also you can add asset price min/max, var, expected shortfall as tuple like
+iron_condor_delta_zero.plot_strategy(var_breakeven=(4668.13*0.8,4668.13*1.2))
+```
+The results is :
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/iron_condor.png?raw=true)
 ### vol_structure
 Given the same datas as for example in bs_pricer implied_solver. 
 With this module you can interpolate, and plot smile and surface.
