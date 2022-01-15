@@ -1,4 +1,4 @@
-
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/logo.png?raw=true)
 -----------------
 # DerivativesTools - Python Powerful Derivatives Management
 
@@ -234,6 +234,18 @@ iron_condor_delta_zero.plot_strategy(var_breakeven=(4668.13*0.8,4668.13*1.2))
 ```
 The results is :
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/iron_condor.png?raw=true)
+
+### graphs_greeks
+This module allow you to plot greeks sensitivity regarding four types 
+of market move :
+- Spot
+- Volatility
+- Time
+- Rates
+
+Let's make an example with the iron condor strategy that we have seen in the last part
+and compute what is the sensibility of this strategy regarding spot move
+
 ### vol_structure
 Given the same datas as for example in bs_pricer implied_solver. 
 With this module you can interpolate, and plot smile and surface.
