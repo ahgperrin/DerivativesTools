@@ -217,7 +217,7 @@ to update implied volatility of your options
 
 - Plotting and work 
 You can see the breakeven Positive Negative PnL of your strategy using
-```
+```pycon
 iron_condor_delta_zero.breakeven()
 Out[13]: [4518.7498399999995, 4808.1739, 5223.63747, 9336.26]
 ```
@@ -227,7 +227,7 @@ Then switch negative at 4808 then switch positive
 at 5223 till maximum.
 
 You can also plot the strategy with 
-```
+```pycon
 iron_condor_delta_zero.plot_strategy()
 # Also you can add asset price min/max, var, expected shortfall as tuple like
 iron_condor_delta_zero.plot_strategy(var_breakeven=(4668.13*0.8,4668.13*1.2))
@@ -244,8 +244,19 @@ of market move :
 - Rates
 
 Let's make an example with the iron condor strategy that we have seen in the last part
-and compute what is the sensibility of this strategy regarding spot move
-
+and compute what is the sensibility of this strategy regarding spot moves.
+```pycon
+import DerivativesTools.options_tools.graphs_greeks as gg
+# Let's plot the graph (if graphs=False you will get the values only)
+gg.spot_sensi(iron_condor_delta_zero,spot=4668.13,basis=365,computation_date=datetime.now(),graphs=True)
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/spot_sensi.png?raw=true)
+```pycon
+import DerivativesTools.options_tools.graphs_greeks as gg
+# doing another with the time
+gg.spot_sensi(iron_condor_delta_zero,spot=4668.13,basis=365,graphs=True)
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/time_sensi.png?raw=true)
 ### vol_structure
 Given the same datas as for example in bs_pricer implied_solver. 
 With this module you can interpolate, and plot smile and surface.
