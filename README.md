@@ -77,7 +77,7 @@ PACKAGE CONTENTS<br>
 &emsp; &emsp; &emsp; &emsp; tools (Module)<br>
 
 ## Import Framework
-```pycon
+```yaml
 # Import a module to use it as reference
 import DerivativesTools.bs_pricer.pricing as p
 import DerivativesTools.fx_pricer.fx_pricer as fx
@@ -93,7 +93,7 @@ european options using black and scholes model.
 The package contains four modules: bs_params (parameters class), greeks (greeks computation)
 implied_solver (solving volatility from prices), pricing (pricing function).
 ### pricing
-```pycon
+```yaml
 import DerivativesTools.bs_pricer.pricing as p
 # Calculate time in years
 delta_t = p.time_maturity(datetime.now(),datetime(2022,2,18,9),365)
@@ -113,7 +113,7 @@ p.drift(spy_c_4700)
 Out[15]: -0.0012302412436982584
 ```
 ### greeks
-```pycon
+```yaml
 import DerivativesTools.bs_pricer.greeks as g
 # With the same example as for pricing
 g.option_carac(spy_c_4700,side=1)
@@ -176,13 +176,13 @@ this module you can create a portfolio and buy/sell :
 - Spot (Basis cash flows adding delta one)
 Steps :
 - Create a portfolio
-```pycon
+```yaml
 import DerivativesTools.options_tools.options_portfolio as port 
 from datetime import datetime
 iron_condor_delta_zero = port.OptionPortfolio(spot=4668.13,strategy_name="Iron Condor Delta 0")
 ```
 - Add instrument
-```pycon
+```yaml
 # Let's add the short side
 iron_condor_delta_zero.short_call(43.63,4750,datetime(2022,2,18),0.1375,0,0,1)
 iron_condor_delta_zero.short_put(55.34,4550,datetime(2022,2,18),0.187,0,0,1)
@@ -203,7 +203,7 @@ iron_condor_delta_zero.long_future("SPY FEB18 FUTURES",datetime(2022,2,18),4668.
 
 ```
 - Update portfolio
-```pycon
+```yaml
 # Let's update to see the results
 iron_condor_delta_zero.update_greeks(spot=4668.13,computation_date=datetime.now(),base=365)
 ====== PORTFOLIO DESCRIPTION ======
@@ -219,7 +219,7 @@ to update implied volatility of your options
 
 - Plotting and work 
 You can see the breakeven Positive Negative PnL of your strategy using
-```pycon
+```yaml
 iron_condor_delta_zero.breakeven()
 Out[13]: [4518.7498399999995, 4808.1739, 5223.63747, 9336.26]
 ```
@@ -229,7 +229,7 @@ Then switch negative at 4808 then switch positive
 at 5223 till maximum.
 
 You can also plot the strategy with 
-```pycon
+```yaml
 iron_condor_delta_zero.plot_strategy()
 # Also you can add asset price min/max, var, expected shortfall as tuple like
 iron_condor_delta_zero.plot_strategy(var_breakeven=(4668.13*0.8,4668.13*1.2))
@@ -247,13 +247,13 @@ of market move :
 
 Let's make an example with the iron condor strategy that we have seen in the last part
 and compute what is the sensibility of this strategy regarding spot moves.
-```pycon
+```yaml
 import DerivativesTools.options_tools.graphs_greeks as gg
 # Let's plot the graph (if graphs=False you will get the values only)
 gg.spot_sensi(iron_condor_delta_zero,spot=4668.13,basis=365,computation_date=datetime.now(),graphs=True)
 ```
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/spot_sensi.png?raw=true)
-```pycon
+```yaml
 import DerivativesTools.options_tools.graphs_greeks as gg
 # doing another with the time
 gg.spot_sensi(iron_condor_delta_zero,spot=4668.13,basis=365,graphs=True)
@@ -262,7 +262,7 @@ gg.spot_sensi(iron_condor_delta_zero,spot=4668.13,basis=365,graphs=True)
 ### vol_structure
 Given the same datas as for example in bs_pricer implied_solver. 
 With this module you can interpolate, and plot smile and surface.
-```pycon
+```yaml
 import DerivativesTools.options_tools.vol_structure as vol
 smile_spy_FEB22 = vol.SmileView(strikes = [3500,3700,3900,4100,4300,4500,4700],
                                 implied_vols = [0.55088305, 0.46937067, 0.3947695 , 0.3285587 , 0.27001135,
@@ -273,7 +273,7 @@ smile_spy_FEB22.plot_smile()
 ```
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/smile.png?raw=true)
 
-```pycon
+```yaml
 import DerivativesTools.options_tools.vol_structure as vol
 strikes = np.array([3500,3700,3900,4100,4300,4500,4700])
 times = np.array([delta_t,p.time_maturity(datetime.now(),datetime(2022,3,18,9),365),p.time_maturity(datetime.now(),datetime(2022,6,17,9),365)])
@@ -298,19 +298,19 @@ the pricing, var, probability breakeven are computed.
 ### Geometric Brownian motion
 The most classic model is the brownian motion. You can simulate the brownian 
 following the example below.
-```pycon
+```yaml
 import DerivativesTools.simulation_tools.geometric_brownian as gb
 model = gb.GeometricBrownianParams(mu=0.02,sigma=0.2,tt_maturity=1,delta=365,spot_zero=100)
 simulation = gb.brownian_path(model,n_paths=100)
 ```
 With the simulation you can perform a graphs using:
-```pycon
+```yaml
 simulation.plot_simulation("Geometric Brownian",nb_paths=50)
 ```
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/brownian.png?raw=true)
 You can also compute value at risk 5%, or compute the probability of the spot
 to be over a price at the maturity, or multiple values.
-```pycon
+```yaml
 simulation.breakeven_probability(130)
 Out[6]: 0.11
 simulation.breakeven_monte_carlo([100,120,140])
@@ -324,14 +324,14 @@ Out[10]: -30.983227259928537
 ```
 You can also plot the distribution of returns for you simulation (avoid
 this method for simulation >1000 draw)
-```pycon
+```yaml
 simulation.plot_distribution()
 ```
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/dist.png?raw=true)
 
 ### Merton Jump Diffusion
 This allows you to generate merton jumpr diffusion model draw.
-```pycon
+```yaml
 import DerivativesTools.simulation_tools.merton_jump_diff as mjd
 model = mjd.JumpDiffusionParams(mu=0.02,sigma=0.2,tt_maturity=1,delta=365,spot_zero=100,jumps_lambda=1,jumps_mu=0,jumps_sigma=0.3)
 simulation = mjd.merton_jump_path(model,n_paths=100)
@@ -345,7 +345,7 @@ The simulation object generated has exactly the same features as brownian model.
 
 This allows you to generate mean reverting model simulation. The simulation
 object generated has exactly the same features as other simulations.
-```pycon
+```yaml
 import DerivativesTools.simulation_tools.ornstein_uhlenbeck as ou
 model = ou.OrnsteinUhlenbeckParams(theta=100,sigma=0.2,tt_maturity=1,delta=365,spot_zero=100,kappa=3)
 simulation = ou.ornstein_uhlenbeck_path(model,n_paths=100)
@@ -356,7 +356,7 @@ simulation.plot_simulation("Ornstein Uhlenbeck Model",nb_paths=30)
 ### Heston model 
 With this module you can simulate heston model draw. The simulation 
 object generate has different characteristics as you can also plot volatility.
-```pycon
+```yaml
 import DerivativesTools.simulation_tools.heston as h
 model = h.HestonParams(mu=0.02,tt_maturity=1,delta=365,spot_zero=100,vol_zero=0.1,alpha=3,sigma_vol=0.5,mu_vol=0.25,covariance=-0.67)
 # If volat_process=True you will be able to plot both volatility and asset
@@ -370,7 +370,7 @@ simulation.plot_both("Heston Model",nb_paths=30)
 
 This package is useful in order to generate simulation of a portfolio, 
 with multiple correlated asset.
-```pycon
+```yaml
 import DerivativesTools.simulation_tools.correlated_portfolio as cport
 asset_1 = cport.GeometricBrownianParams(0.02,0.3,1,365,100)
 asset_2 =  cport.GeometricBrownianParams(0.03,0.1,1,365,100)
