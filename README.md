@@ -135,7 +135,7 @@ g.theta(spy_c_4700,side=-1)
 Out[20]: 1.120305076879068
 ```
 ### implied_solver
-```pycon
+```yaml
 import DerivativesTools.bs_pricer.implied_solver as solve
 # Solve the volatility of our example option if the price is 80$
 solve.implied_vol(spy_c_4700,80)
