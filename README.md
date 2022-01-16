@@ -289,4 +289,37 @@ surface_spy.plot_surface()
 ```
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/surface.png?raw=true)
 ## simulation_tools
+This package is useful in order to simulate asset price (var computation, 
+pricing by montecarlo ..). This package can simulate multiple types
+of model, but return each simulation into a simulation class in which 
+the pricing, var, probability breakeven are computed.
+### Geometric Brownian motion
+The most classic model is the brownian motion. You can simulate the brownian 
+following the example below.
+```pycon
+import DerivativesTools.simulation_tools.geometric_brownian as gb
+model = gb.GeometricBrownianParams(mu=0.02,sigma=0.2,tt_maturity=1,delta=365,spot_zero=100)
+simulation = gb.brownian_path(model,n_paths=100)
+```
+With the simulation you can perform a graphs using:
+```pycon
+simulation.plot_simulation("Geometric Brownian",nb_paths=50)
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/brownian.png?raw=true)
+You can also compute value at risk 5%, or compute the probability of the spot
+to be over a price at the maturity
+```pycon
+simulation.breakeven_probability(130)
+Out[6]: 0.11
+# Value at risk in $ with confidence interval (Interval could be reduced by increasing the number
+#of simulation )
+simulation.value_at_risk(alpha=0.05)
+Out[7]: (-28.17445092091809, (-32.38153365326299, -23.967368188573193))
+```
+You can also plot the distribution of returns for you simulation (avoid
+this method for simulation >1000 draw)
+```pycon
+simulation.plot_distribution()
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/dist.png?raw=true)
 # Future Release
