@@ -164,9 +164,37 @@ array([[0.45039449, 0.36510866, 0.32090798],
        [0.15650284, 0.15987016, 0.17808935]])
 ```
 ## futures_tools
-
+This package contains only one module that allow you to create spot position and futures position
+that are used by options_portfolio. Regarding the futures, you can use 
+some methods in order to determine basis, compute hadging ratio ..
+For example let's create a march futures on SPY.
+```yaml
+import DerivativesTools.futures_tools.futures as f
+from datetime import datetime
+fut_march22_Spy = f.Futures("MARCH22 Mini SPY",datetime(2022,3,20),4500,1,10)
+fut_march22_Spy.hedging_portfolio(portfolio_size=1000000,beta=0.8)
+Out[7]: 17.77777777777778
+fut_march22_Spy.remaining_time(computation_date=datetime.now(),basis=365)
+Out[8]: 0.17124671048271817
+fut_march22_Spy.implied_rate(spot=4400,computation_date=datetime.now(),basis=365)
+Out[9]: 0.13123149501193157
+fut_march22_Spy.hedging_cross_asset(position=1000000,sigma_a=0.3,sigma_fut=0.21,correlation=0.4)
+Out[10]: 12.6984126984127
+```
 ## fx_pricer
-
+Fx Pricer allows you to deal with fx swap pricing. Let's make an example between EUR
+and USD
+```yaml
+import DerivativesTools.fx_pricer.fx_pricer as fx
+fx.fx_forward(spot=1.14,rate_term=0.2,rate_base=-0.5,base_term=365,base_base=365,tt_maturity=0.4)
+Out[17]: 1.1408749999999999
+fx.swap_points(spot=1.14,rate_term=0.2,rate_base=-0.5,base_term=365,base_base=365,tt_maturity=0.4)
+Out[18]: 0.0008749999999999591
+fx.implied_rate_cc1(spot=1.14,swap= 0.0008749999999999591,rate_cc2=0.2,base_cc2=365,base_cc1=365,tt_maturity=0.4)
+Out[19]: -0.4999999999999574
+fx.implied_rate_cc2(spot=1.14,swap= 0.0008749999999999591,rate_cc1=-0.5,base_cc2=365,base_cc1=365,tt_maturity=0.4)
+Out[20]: 0.20000000000006402
+```
 ## options_tools
 ### options_portfolio
 This module is useful in order to create derivatives strategies. With 
