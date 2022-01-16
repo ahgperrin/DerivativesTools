@@ -164,7 +164,9 @@ array([[0.45039449, 0.36510866, 0.32090798],
        [0.15650284, 0.15987016, 0.17808935]])
 ```
 ## futures_tools
+
 ## fx_pricer
+
 ## options_tools
 ### options_portfolio
 This module is useful in order to create derivatives strategies. With 
@@ -307,14 +309,18 @@ simulation.plot_simulation("Geometric Brownian",nb_paths=50)
 ```
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/brownian.png?raw=true)
 You can also compute value at risk 5%, or compute the probability of the spot
-to be over a price at the maturity
+to be over a price at the maturity, or multiple values.
 ```pycon
 simulation.breakeven_probability(130)
 Out[6]: 0.11
+simulation.breakeven_monte_carlo([100,120,140])
+Out[9]: [0.63, 0.19, 0.07]
 # Value at risk in $ with confidence interval (Interval could be reduced by increasing the number
-#of simulation )
+#of simulation ), you can also compute expected shortfall($).
 simulation.value_at_risk(alpha=0.05)
 Out[7]: (-28.17445092091809, (-32.38153365326299, -23.967368188573193))
+simulation.expected_shortfall(alpha=0.05)
+Out[10]: -30.983227259928537
 ```
 You can also plot the distribution of returns for you simulation (avoid
 this method for simulation >1000 draw)
@@ -322,4 +328,61 @@ this method for simulation >1000 draw)
 simulation.plot_distribution()
 ```
 ![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/dist.png?raw=true)
+
+### Merton Jump Diffusion
+This allows you to generate merton jumpr diffusion model draw.
+```pycon
+import DerivativesTools.simulation_tools.merton_jump_diff as mjd
+model = mjd.JumpDiffusionParams(mu=0.02,sigma=0.2,tt_maturity=1,delta=365,spot_zero=100,jumps_lambda=1,jumps_mu=0,jumps_sigma=0.3)
+simulation = mjd.merton_jump_path(model,n_paths=100)
+simulation.plot_simulation("Merton JUmp Diffusion",nb_paths=30)
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/merton.png?raw=true)
+
+The simulation object generated has exactly the same features as brownian model.
+
+### Ornstein Uhlenbeck
+
+This allows you to generate mean reverting model simulation. The simulation
+object generated has exactly the same features as other simulations.
+```pycon
+import DerivativesTools.simulation_tools.ornstein_uhlenbeck as ou
+model = ou.OrnsteinUhlenbeckParams(theta=100,sigma=0.2,tt_maturity=1,delta=365,spot_zero=100,kappa=3)
+simulation = ou.ornstein_uhlenbeck_path(model,n_paths=100)
+simulation.plot_simulation("Ornstein Uhlenbeck Model",nb_paths=30)
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/ornstein.png?raw=true)
+
+### Heston model 
+With this module you can simulate heston model draw. The simulation 
+object generate has different characteristics as you can also plot volatility.
+```pycon
+import DerivativesTools.simulation_tools.heston as h
+model = h.HestonParams(mu=0.02,tt_maturity=1,delta=365,spot_zero=100,vol_zero=0.1,alpha=3,sigma_vol=0.5,mu_vol=0.25,covariance=-0.67)
+# If volat_process=True you will be able to plot both volatility and asset
+# Else you will have the same object as for others model.
+simulation = h.heston_path(model,n_paths=100,volat_process=True)
+simulation.plot_both("Heston Model",nb_paths=30)
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/heston.png?raw=true)
+
+### Correlated Assets
+
+This package is useful in order to generate simulation of a portfolio, 
+with multiple correlated asset.
+```pycon
+import DerivativesTools.simulation_tools.correlated_portfolio as cport
+asset_1 = cport.GeometricBrownianParams(0.02,0.3,1,365,100)
+asset_2 =  cport.GeometricBrownianParams(0.03,0.1,1,365,100)
+matrix_portfolio = (np.array([[1., -0.80],
+                         [-0.8, 1.]]), [0, 0])
+model_params = [asset_1,asset_2]
+simulation = cport.portfolio_paths(matrix =matrix_portfolio[0], mu_matrix = matrix_portfolio[1], list_params=model_params, weights=[0.5,0.5], nb_paths=200)
+simulation.value_at_risk(alpha=0.05)
+Out[23]: (-12.194954869776197, (-14.08579461643647, -10.304115123115924))
+simulation.plot_simulation("Correlated Portfolio Simulation",nb_paths=30)
+```
+![](https://github.com/ahgperrin/DerivativesTools/blob/master/examples/corraleted.png?raw=true)
+
+
 # Future Release
