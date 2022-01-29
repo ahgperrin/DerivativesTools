@@ -39,7 +39,7 @@ class Simulation:
         return np.mean(np.maximum(self.paths[-1] - strike, 0)) * np.exp(-rf * tt_maturity)
 
     def european_put(self, strike: float, rf: float, tt_maturity: float) -> float:
-        return np.mean(strike - np.maximum(self.paths[-1], 0)) * np.exp(-rf * tt_maturity)
+        return np.mean(np.maximum(strike - self.paths[-1], 0)) * np.exp(-rf * tt_maturity)
 
     def value_at_risk(self, alpha: float, up: bool = True):
         nb_scenarios = math.ceil(alpha * len(self.paths[0]))
@@ -114,7 +114,7 @@ class SimulationProcVol:
         return np.mean(np.maximum(self.paths[-1] - strike, 0)) * np.exp(-rf * tt_maturity)
 
     def european_put(self, strike: float, rf: float, tt_maturity: float) -> float:
-        return np.mean(strike - np.maximum(self.paths[-1], 0)) * np.exp(-rf * tt_maturity)
+        return np.mean(np.maximum(strike - self.paths[-1], 0)) * np.exp(-rf * tt_maturity)
 
     def value_at_risk(self, alpha: float, up: bool = True):
         nb_scenarios = math.ceil(alpha * len(self.paths[0]))
