@@ -10,13 +10,13 @@ from DerivativesTools.bs_pricer.implied_solver import *
 
 def merton_jump_path(mjd_params: JumpDiffusionParams, n_paths: int) -> Simulation:
     poi_rv = np.multiply(np.random.poisson(mjd_params.j_lambda * (mjd_params.tt_maturity / mjd_params.delta),
-                                           size=(mjd_params.delta - 1, n_paths)),
+                                           size=(mjd_params.delta , n_paths)),
                          np.random.normal(mjd_params.j_mu, mjd_params.j_sigma,
-                                          size=(mjd_params.delta - 1, n_paths))).cumsum(axis=0)
+                                          size=(mjd_params.delta , n_paths))).cumsum(axis=0)
     geo = np.cumsum(((mjd_params.mu - mjd_params.sigma ** 2 / 2 - mjd_params.j_lambda * (
             mjd_params.j_mu + mjd_params.j_sigma ** 2 * 0.5)) * (mjd_params.tt_maturity / mjd_params.delta) +
                      mjd_params.sigma * np.sqrt((mjd_params.tt_maturity / mjd_params.delta)) *
-                     np.random.normal(size=(mjd_params.delta - 1, n_paths))), axis=0)
+                     np.random.normal(size=(mjd_params.delta , n_paths))), axis=0)
 
     return Simulation(np.insert(np.exp(geo + poi_rv) * mjd_params.spot_zero, 0, mjd_params.spot_zero, axis=0))
 

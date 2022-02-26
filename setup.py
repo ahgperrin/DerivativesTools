@@ -23,6 +23,7 @@ setup(
                 "geometric_brownian",
                 "heston",
                 "merton_jump_diffusion",
+                "cev_process"
                 "model_params",
                 "ornstein_uhlenbeck",
                 "simulation_computation",

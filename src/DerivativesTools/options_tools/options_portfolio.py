@@ -2,6 +2,9 @@ from DerivativesTools.options_tools.options import Options
 from datetime import datetime
 from DerivativesTools.bs_pricer.greeks import *
 from DerivativesTools.futures_tools.futures import Futures, Spot
+from DerivativesTools.simulation_tools.simulation_computation import Simulation
+from typing import Union
+from scipy.interpolate import interp1d
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -13,7 +16,7 @@ class OptionPortfolio:
         self.spot = spot
         self.name = strategy_name
         self.instrument: [Options, Futures, Spot] = []
-        self.maturity_spots = np.arange(0, spot * 2, spot / 1000)
+        self.maturity_spots = np.arange(0, spot * 2.5, spot / 1000)
         self.payoffs = np.zeros_like(self.maturity_spots)
         self.premiums = 0
         self.delta = 0
@@ -128,6 +131,17 @@ class OptionPortfolio:
                 breakeven.append(results[i])
         breakeven.append(results[len(results) - 1])
         return breakeven
+
+    def value_at_risk(self, simulation: Simulation, computation_date: datetime,
+                      base,maturity:datetime=None) -> tuple:
+        if maturity is None:
+            tt_maturity = (self.instrument[0].maturity_datetime - computation_date).total_seconds() / (base * 86400)
+        else:
+            tt_maturity = (maturity - computation_date).total_seconds() / (base * 86400)
+        payoff_interp = interp1d(self.maturity_spots, self.payoffs, kind='cubic')
+        var_up = simulation.paths[0][0] - simulation.interpolate_var(tt_maturity * 365, False)
+        var_down = simulation.paths[0][0] + simulation.interpolate_var(tt_maturity * 365, True)
+        return float(payoff_interp(var_up)), float(payoff_interp(var_down))
 
     def plot_strategy(self, var_breakeven: tuple = None, es_breakeven: tuple = None, min_max: tuple = None):
         fig = plt.figure(figsize=(12.5, 8))

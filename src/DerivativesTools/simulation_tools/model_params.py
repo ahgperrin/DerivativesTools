@@ -367,3 +367,85 @@ class OrnsteinUhlenbeckParams:
         print("Process Delta Time : ", self.params.get("delta"))
         print("Process Spot : ", self.params.get("spot_zero"))
         print("============================================")
+
+
+class ConstantElasticityParams:
+
+    def __init__(self, mu: float, sigma: float, tt_maturity: float, delta: int, spot_zero: float,
+                 gamma: float) -> None:
+        self._mu = mu
+        self._sigma = sigma
+        self._gamma = gamma
+        self._tt_maturity = tt_maturity
+        self._delta = delta
+        self._spot_zero = spot_zero
+
+    @property
+    def mu(self) -> float:
+        return self._mu
+
+    @mu.setter
+    def mu(self, value: float) -> None:
+        self._mu = value
+
+    @property
+    def tt_maturity(self) -> float:
+        return self._tt_maturity
+
+    @tt_maturity.setter
+    def tt_maturity(self, value: float) -> None:
+        self._tt_maturity = value
+
+    @property
+    def delta(self) -> int:
+        return self._delta
+
+    @delta.setter
+    def delta(self, value: int) -> None:
+        self._delta = value
+
+    @property
+    def spot_zero(self) -> float:
+        return self._spot_zero
+
+    @spot_zero.setter
+    def spot_zero(self, value: float) -> None:
+        self._spot_zero = value
+
+    @property
+    def gamma(self) -> float:
+        return self._gamma
+
+    @gamma.setter
+    def gamma(self, value: float) -> None:
+        self._gamma = value
+
+    @property
+    def sigma(self) -> float:
+        return self._sigma
+
+    @sigma.setter
+    def sigma(self, value: float) -> None:
+        self._sigma = value
+
+    @property
+    def params(self) -> dict:
+        return {
+            "mu": self._mu,
+            "gamma": self._gamma,
+            "sigma": self._sigma,
+            "tt_maturity": self._tt_maturity,
+            "delta": self._delta,
+            "spot_zero": self._spot_zero
+        }
+
+    def print_model(self):
+        print("======== Ornstein-Uhlenbeck Process ========")
+        print("============================================")
+        print("Diffusion Mean : ", self.params.get("mu"))
+        print("Process Elasticity : ", self.params.get("gamma"))
+        print("Volatility : ", self.params.get("sigma"))
+        print("Process Time to maturity : ", self.params.get("tt_maturity"))
+        print("Process Delta Time : ", self.params.get("delta"))
+        print("Process Spot : ", self.params.get("spot_zero"))
+        print("============================================")

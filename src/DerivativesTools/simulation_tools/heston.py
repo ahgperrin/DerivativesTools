@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from DerivativesTools.simulation_tools.model_params import HestonParams, OrnsteinUhlenbeckParams
 from DerivativesTools.simulation_tools.ornstein_uhlenbeck import calibration_ornstein_uhlenbeck
-from DerivativesTools.simulation_tools.simulation_computation import Simulation, SimulationProcVol
+from DerivativesTools.simulation_tools.simulation_computation import Simulation
 
 pd.options.mode.chained_assignment = None
 
@@ -37,7 +37,7 @@ def heston_path(heston_params: HestonParams, n_paths: int, volat_process: bool =
     prices = np.insert(prices.T, 0, heston_params.spot_zero, axis=0)
     volatility = np.insert(volatility.T, 0, heston_params.vol_zero, axis=0)
     if volat_process:
-        return SimulationProcVol(prices, volatility)
+        return Simulation(prices, volatility)
     return Simulation(prices)
 
 
