@@ -17,9 +17,11 @@ class Simulation:
 
     def __init__(self, paths: np.ndarray, paths_vol=None) -> None:
         self._paths = paths
+        self._paths_vol = paths_vol
         self._var_paths = self.var_function(0.01, True)
         self._var_up_paths = self.var_function(0.01, False)
-        self._paths_vol = paths_vol
+        self._vol_var_paths = self.vol_var_function(0.01, True)
+        self._vol_var_up_paths = self.vol_var_function(0.01, False)
 
     @property
     def paths(self) -> np.ndarray:
@@ -38,7 +40,7 @@ class Simulation:
         self._paths_vol = paths_vol
 
     @property
-    def var_paths(self) -> tuple:
+    def var_paths(self) -> list:
         return self._var_paths
 
     @var_paths.setter
@@ -46,12 +48,28 @@ class Simulation:
         self._var_paths = var_paths
 
     @property
-    def var_up_paths(self) -> tuple:
+    def var_up_paths(self) -> list:
         return self._var_up_paths
 
     @var_up_paths.setter
     def var_up_paths(self, var_up_paths: tuple) -> None:
         self._var_up_paths = var_up_paths
+
+    @property
+    def vol_var_paths(self) -> list:
+        return self._vol_var_paths
+
+    @vol_var_paths.setter
+    def vol_var_paths(self, vol_var_paths: tuple) -> None:
+        self._vol_var_paths = vol_var_paths
+
+    @property
+    def vol_var_up_paths(self) -> list:
+        return self._vol_var_up_paths
+
+    @vol_var_up_paths.setter
+    def vol_var_up_paths(self, vol_var_up_paths: tuple) -> None:
+        self._vol_var_up_paths = vol_var_up_paths
 
     def plot_simulation(self, title: str, nb_paths: int) -> plt.Figure:
         fig = plt.figure()
@@ -80,6 +98,18 @@ class Simulation:
         conf_int = st.t.interval(1 - alpha, len(sorted_scenarios) - 1, loc=var, scale=st.sem(sorted_scenarios))
         return var, conf_int
 
+    def vol_var_function(self, alpha: float, up: bool = True):
+        nb_scenarios = math.ceil(alpha * len(self.paths_vol[0]))
+        var = []
+        for i in range(len(self.paths_vol)):
+            if up:
+                sorted_scenarios = np.sort(self.paths_vol[i])
+                var.append(sorted_scenarios[nb_scenarios] )
+            else:
+                sorted_scenarios = np.sort(self.paths_vol[i])[::-1]
+                var.append(sorted_scenarios[nb_scenarios])
+        return var
+
     def var_function(self, alpha: float, up: bool = True):
         nb_scenarios = math.ceil(alpha * len(self.paths[0]))
         var = []
@@ -96,7 +126,14 @@ class Simulation:
         if up:
             var_interp = interp1d(np.arange(0, len(self.var_paths), 1), self.var_paths, kind='cubic')
         else:
-            var_interp = interp1d(np.arange(0, len(self.var_up_paths), 1), self.var_paths, kind='cubic')
+            var_interp = interp1d(np.arange(0, len(self.var_up_paths), 1), self.var_up_paths, kind='cubic')
+        return float(var_interp(time_var))
+
+    def interpolate_var_vol(self, time_var: float, up: bool = True):
+        if up:
+            var_interp = interp1d(np.arange(0, len(self.vol_var_paths), 1), self.vol_var_paths, kind='cubic')
+        else:
+            var_interp = interp1d(np.arange(0, len(self.vol_var_up_paths), 1), self.vol_var_up_paths, kind='cubic')
         return float(var_interp(time_var))
 
     def plot_var(self, up: bool = True):
@@ -109,7 +146,7 @@ class Simulation:
         ax1 = fig.add_subplot(1, 1, 1)
         ax1.plot(var, lw=0.7)
         ax1.set_xlabel("Time,t")
-        ax1.set_ylabel("Value at risk "+str(alpha*100)+"%")
+        ax1.set_ylabel("Value at risk "+str(0.01*100)+"%")
 
     def breakeven_probability(self, breakeven_value: float):
         sorted_scenarios = np.sort(self.paths[-1])

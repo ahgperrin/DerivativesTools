@@ -14,7 +14,7 @@ def rho(params: BsParams, side: int) -> float:
 
 
 def vega(params: BsParams, side: int) -> float:
-    return side * 0.01 * params.spot * dividend_factor(params) * np.sqrt(params.time_maturity * norm.pdf(d1(params)))
+    return side * 0.01 * params.spot * dividend_factor(params) * np.sqrt(params.time_maturity) * norm.pdf(d1(params))
 
 
 def theta(params: BsParams, side: int) -> float:
